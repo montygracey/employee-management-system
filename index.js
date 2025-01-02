@@ -130,25 +130,45 @@ const mainMenu = () => {
                         });
                     });
                     break;
-            case 'Update an employee role':
-                inquirer.prompt([
-                    {
-                        type: 'input',
-                        name: 'employee_id',
-                        message: 'Enter the ID of the employee you want to update:'
-                    },
-                    {
-                        type: 'input',
-                        name: 'role_id',
-                        message: 'Enter the new role ID for the employee:'
-                    }
-                ]).then(answer => {
-                    updateEmployeeRole(answer.employee_id, answer.role_id).then(() => {
-                        console.log('Employee role updated successfully!');
-                        mainMenu();
-                    });
-                });
-                break;
+                    case 'Update an employee role':
+                        inquirer.prompt([
+                            {
+                                type: 'input',
+                                name: 'employee_id',
+                                message: 'Enter the ID of the employee you want to update:',
+                                validate: (input) => {
+                                    const employeeIdInt = parseInt(input, 10);
+                                    if (isNaN(employeeIdInt)) {
+                                        return 'Please enter a valid integer for the employee ID.';
+                                    }
+                                    return true;
+                                }
+                            },
+                            {
+                                type: 'input',
+                                name: 'role_id',
+                                message: 'Enter the new role ID for the employee:',
+                                validate: (input) => {
+                                    const roleIdInt = parseInt(input, 10);
+                                    if (isNaN(roleIdInt)) {
+                                        return 'Please enter a valid integer for the role ID.';
+                                    }
+                                    return true;
+                                }
+                            }
+                        ]).then(answer => {
+                            const { employee_id, role_id } = answer;
+                            updateEmployeeRole(employee_id, role_id)
+                                .then(() => {
+                                    console.log('Employee role updated successfully!');
+                                    mainMenu();
+                                })
+                                .catch(err => {
+                                    console.error('Error updating employee role:', err.message);
+                                    mainMenu();
+                                });
+                        });
+                        break;
             case 'Exit':
                 process.exit();
         }
